@@ -3,13 +3,17 @@ from pyphysx_utils.rate import Rate
 from pyphysx_render.pyrender import PyPhysxViewer
 import numpy as np
 import numpy.random
+import pandas as pd
+import matplotlib.pyplot as plt
 
 scene = Scene()
 scene.add_actor(RigidStatic.create_plane(material=Material(static_friction=0.0, dynamic_friction=0.0, restitution=0.5)))
 
+## Set parameters
 wall_length = 6.
 unit = .2
 
+## Set "boundaries"
 north_wall = RigidStatic()
 north_wall.attach_shape(Shape.create_box([unit, wall_length, unit], Material(restitution=1.)))
 north_wall.set_global_pose([-1*wall_length/2, 0, unit/2])
@@ -30,7 +34,7 @@ west_wall.attach_shape(Shape.create_box([wall_length, .2, .2], Material(restitut
 west_wall.set_global_pose([0, -wall_length/2, unit/2])
 scene.add_actor(west_wall)
 
-
+#Set actors/cubes
 actors = []
 number_actors = 6
 for item in range(number_actors):
@@ -40,7 +44,7 @@ for item in range(number_actors):
         [np.random.uniform( -1 * int(wall_length/2), int(wall_length/2) ), 
          np.random.uniform( -1 * int(wall_length/2), int(wall_length/2) ), 
          0])
-    actor.set_linear_velocity([np.random.random(),np.random.random(),0])
+    actor.set_linear_velocity([np.random.uniform(-1, 1),np.random.uniform(-1, 1),0])
     actor.set_mass(1.)
     actors.append(actor)
 
@@ -48,12 +52,16 @@ for actor in actors:
     scene.add_actor(actor)
 
 
-
-render = PyPhysxViewer(video_filename='videos/01_free_fall.gif')
+#Initialize scene
+render = PyPhysxViewer(video_filename='videos/02_free_fall.gif')
 render.add_physx_scene(scene)
+
+
 
 rate = Rate(20)
 while render.is_active:
+    #for actor in actors:
+        #print(actor.get_global_pose())
     scene.simulate(rate.period())
     render.update()
     rate.sleep()
