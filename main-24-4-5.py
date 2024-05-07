@@ -6,7 +6,7 @@ import numpy.random
 import pandas as pd
 import matplotlib.pyplot as plt
 import trimesh
-
+import quaternion as quaternion
 
 
 scene = Scene()
@@ -75,3 +75,16 @@ while render.is_active:
     scene.simulate(rate.period())
     render.update()
     rate.sleep()
+
+for actor in actors:
+    pose, quat = actor.get_global_pose()
+    euler_angles = quaternion.as_euler_angles(quat)
+
+# Extract roll, pitch, and yaw
+    roll = euler_angles[0]
+    pitch = euler_angles[1]
+    yaw = euler_angles[2]
+
+    print("Roll:", np.degrees(roll))
+    print("Pitch:", np.degrees(pitch))
+    print("Yaw:", np.degrees(yaw))
