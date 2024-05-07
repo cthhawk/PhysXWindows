@@ -37,17 +37,19 @@ west_wall.attach_shape(ppx.Shape.create_box([wall_length, .2, .2], ppx.Material(
 west_wall.set_global_pose([0, -wall_length/2, unit/2])
 scene.add_actor(west_wall)
 
-obj: trimesh.Scene = trimesh.load('simple-topo.obj', split_object=True, group_material=False)
+obj: trimesh.Scene = trimesh.load('simple-topo-2.obj', split_object=True, group_material=False)
 
 #Set actors/cubes
 actors = []
 number_actors = 1
-topo_obj: trimesh.Scene = trimesh.load('simple-topo.obj', split_object=True, group_material=False)
+topo_obj: trimesh.Scene = trimesh.load('simple-topo-2.obj', split_object=True, group_material=False)
 
 topo = ppx.RigidStatic()
 mesh_mat = ppx.Material()
-topo.attach_shape(ppx.Shape.create_convex_mesh_from_points(topo_obj.vertices, mesh_mat, scale=1))
+for g in topo_obj.geometry.values():
+    topo.attach_shape(ppx.Shape.create_convex_mesh_from_points(g.vertices, mesh_mat, scale=1))
 actors.append(topo)
+
 
 for item in range(number_actors):
     actor = ppx.RigidDynamic()
@@ -61,6 +63,7 @@ for item in range(number_actors):
          0])
     for i, s in enumerate(actor.get_atached_shapes()):
         s.set_user_data(dict(color='tab:blue'))
+    actor.set_linear_velocity([np.random.uniform(-1, 1),np.random.uniform(-1, 1),0])
     #rotate 30 degrees
     pose, q = actor.get_global_pose()
     transform = ppx.cast_transformation([0,0,0,.87, 0, 0, .5])
@@ -74,14 +77,23 @@ for actor in actors:
 
 
 #Initialize scene
-render = PyPhysxViewer(video_filename='videos/12_test.gif')
+render = PyPhysxViewer(video_filename='videos/14_test.gif')
 render.add_physx_scene(scene)
 
 rate = Rate(20)
-while render.is_active:
+
+'''
+##while render.is_active:
     scene.simulate(rate.period())
     render.update()
     rate.sleep()
+'''
+
+for i in range(100):
+    scene.simulate(rate.period())
+render.update()
+
+
 
 
 
